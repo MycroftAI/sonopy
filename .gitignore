@@ -1,0 +1,5 @@
+dist/
+*.egg-info/
+.idea/
+*.pyc
+*venv/
