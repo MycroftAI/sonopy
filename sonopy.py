@@ -58,9 +58,11 @@ def chop_array(arr, window_size, hop_size):
     return [arr[i - window_size:i] for i in range(window_size, len(arr) + 1, hop_size)]
 
 
-def power_spec(audio: np.ndarray, window_stride=(160, 80), fft_size=512):
+def power_spec(audio: np.ndarray, window_stride=(160, 80), fft_size=512, window_fun=None):
     """Calculates power spectrogram"""
     frames = chop_array(audio, *window_stride) or np.empty((0, window_stride[0]))
+    if window_fun is not None:
+        frames *= window_fun
     fft = np.fft.rfft(frames, n=fft_size)
     return (fft.real ** 2 + fft.imag ** 2) / fft_size
 
@@ -72,9 +74,9 @@ def mel_spec(audio, sample_rate, window_stride=(160, 80), fft_size=512, num_filt
 
 
 def mfcc_spec(audio, sample_rate, window_stride=(160, 80),
-              fft_size=512, num_filt=20, num_coeffs=13, return_parts=False):
+              fft_size=512, num_filt=20, num_coeffs=13, return_parts=False, window_fun=None):
     """Calculates mel frequency cepstrum coefficient spectrogram"""
-    powers = power_spec(audio, window_stride, fft_size)
+    powers = power_spec(audio, window_stride, fft_size, window_fun=window_fun)
     if powers.size == 0:
         return np.empty((0, min(num_filt, num_coeffs)))
 
